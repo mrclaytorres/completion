@@ -68,10 +68,12 @@ def completion():
   prompt_list = []
   output_list = []
 
-  with open('terms.csv') as f:
+  with open('terms.csv', encoding='unicode_escape') as f:
     reader = csv.DictReader(f)
 
     for line in reader:
+
+      row_time_start = datetime.datetime.now().replace(microsecond=0)
 
       converted_row = convert_row( line )
       # prompt = converted_row['Prompt']
@@ -96,7 +98,6 @@ def completion():
 
         print(f'{response.choices[0].message.content}\n')
         print(f'Usage: Prompt tokens: {response.usage.prompt_tokens}, Completion tokens: {response.usage.completion_tokens}, Total tokens: {response.usage.total_tokens}\n')
-        print(f'______________________________\n')
 
         topic_list.append(topic)
         prompt_list.append(user)
@@ -109,10 +110,15 @@ def completion():
         output_list.append('Unexpected error occured')
         logging.exception("Oops:")
         pass
+      
+      row_time_end = datetime.datetime.now().replace(microsecond=0)
+      row_run_time = row_time_end - row_time_start
+      print(f"Row runtime: {row_run_time}.\n")
   
   time_end = datetime.datetime.now().replace(microsecond=0)
   runtime = time_end - time_start
   print(f"Script runtime: {runtime}.\n")
+  print(f'______________________________\n')
 
   # Save output to a CSV file
   now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
