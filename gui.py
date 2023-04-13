@@ -11,8 +11,6 @@ import csv
 import creds
 import logging
 
-openai.api_key = creds.OPENAI_API_KEY
-
 # Convert rows into ascii
 def convert_row( row ):
   row_dict = {}
@@ -57,7 +55,7 @@ def text_davinci_003(user, max_tokens):
   return response
 
 def main():
-  # First the window layout
+  # 1st tab elements
   input_file_column = [
     [ sg.T("Choose your model:"), 
       sg.Button("gpt-4"), 
@@ -84,7 +82,14 @@ def main():
       [sg.Multiline(size=(110, 30), echo_stdout_stderr=True, reroute_stdout=True, autoscroll=True, background_color='black', text_color='white', key='-MLINE-')]
   ]
 
-  # ----- Full layout -----
+  # 2nd tab elements
+  openai_api_key = [
+    [sg.T("")],
+    [sg.T("Get your OpenAI API Key here: https://platform.openai.com/docs/api-reference",  enable_events=True,)],
+    [sg.T("Your OpenAI API Key: "), sg.Input(key="-API_KEY-", password_char='*')],
+  ]
+
+  # ----- 1st Tab Layout -----
   layout1 = [
     [
       sg.Column(input_file_column),
@@ -102,10 +107,32 @@ def main():
     ]
   ]
 
-  window = sg.Window("Completion App", layout1)
+  # ----- 2nd Tab Layout -----
+  layout2 = [
+    [
+      sg.Column(openai_api_key)
+    ]
+  ]
 
+  # Create tab group
+  tabgrp = [
+    [
+      sg.TabGroup(
+        [
+          [
+            sg.Tab('App Options', layout1, tooltip='App Options', border_width =10, element_justification= 'center'),
+            sg.Tab('OpenAI Options', layout2, tooltip='OpenAI Options', border_width =10, element_justification= 'center')
+          ]
+        ]
+      )
+    ]
+  ]
 
+  window = sg.Window("Completion App", tabgrp)
+
+  # Initialized variables
   choose_model = ''
+  input_filename = ''
 
   while True:
     event, values = window.read()
@@ -153,6 +180,9 @@ def main():
       window['text-davinci-003'].update(disabled=True)
 
     elif event == 'Run':
+
+      # Assign the API Key
+      openai.api_key = values["-API_KEY-"]
 
       # If user forgot to choose a model
       if choose_model == '':
@@ -231,7 +261,7 @@ def main():
             print(f'______________________________\n')
             window.Refresh()
             pass
-          
+
           window.Refresh()
 
       # Save output to a CSV file
