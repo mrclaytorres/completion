@@ -184,113 +184,123 @@ def main():
       # Assign the API Key
       openai.api_key = values["-API_KEY-"]
 
-      # If user forgot to choose a model
-      if choose_model == '':
-        choose_model = '1'
-        print(f'\nYou did not choose a model, defaulting to gpt-4.\n')
+      # Check if user supplied the API Key
+      if openai.api_key == '':
+        print(f'\nPlease enter your OpenAI API Key...')
         window.Refresh()
-        window['gpt-4'].update(disabled=True)
-        window['gpt-3.5-turbo'].update(disabled=True)
-        window['text-davinci-003'].update(disabled=True)
-      
-      window['Run'].update(disabled=True)
-      # User chooses a model
-      # choose_model = input('1. gpt-4\n2. gpt-3.5-turbo\n3. text-davinci-003\n\nEnter the number that corresponds to the model: ')
-      
-      time_start = datetime.datetime.now().replace(microsecond=0)
-      directory = os.path.dirname(os.path.realpath(__file__))
+      else:
 
-      topic_list = []
-      prompt_list = []
-      output_list = []
+        # Check if the user choosed an input file
+        if input_filename == '':
+          print(f'\nPlease choose an input file and save it.')
+          window.Refresh()
+        else:
 
-      with open(input_filename, encoding='unicode_escape') as f:
-        reader = csv.DictReader(f)
-
-        for line in reader:
-
-          row_time_start = datetime.datetime.now().replace(microsecond=0)
-
-          converted_row = convert_row( line )
-          # prompt = converted_row['Prompt']
-          topic = converted_row['Topic']
-          system = converted_row['System']
-          user = converted_row['User']
-
-          logging.basicConfig(level=logging.DEBUG, filename='error.log')
-
-          try:
-            match choose_model:
-              case '1':
-                print(f'\nWaiting for a response...\n')
-                window.Refresh()
-                response = gpt_4(user, system)
-              case '2':
-                print(f'\nWaiting for a response...\n')
-                window.Refresh()
-                response = gpt_3_5_turbo(user)
-              case '3':
-                max_tokens = input('\nTokens to spend (between 1 to 4,097)?\nEnter token: \n')
-                print(f'\nWaiting for a response...\n')
-                window.Refresh()
-                response = text_davinci_003(user, int(max_tokens))
-
-            print(f'{response.choices[0].message.content}\n')
-            print(f'Usage: Prompt tokens: {response.usage.prompt_tokens}, Completion tokens: {response.usage.completion_tokens}, Total tokens: {response.usage.total_tokens}\n')
-
-            topic_list.append(topic)
-            prompt_list.append(user)
-            output_list.append(response.choices[0].message.content)
-
-            row_time_end = datetime.datetime.now().replace(microsecond=0)
-            row_run_time = row_time_end - row_time_start
-            print(f"Row runtime: {row_run_time}.\n")
-            print(f'______________________________\n')
+          # If user forgot to choose a model
+          if choose_model == '':
+            choose_model = '1'
+            print(f'\nYou did not choose a model, defaulting to gpt-4.\n')
             window.Refresh()
+            window['gpt-4'].update(disabled=True)
+            window['gpt-3.5-turbo'].update(disabled=True)
+            window['text-davinci-003'].update(disabled=True)
           
-          except:
-            print(f'An error occured while working on: {user}\n')
-            topic_list.append(topic)
-            prompt_list.append(user)
-            output_list.append('Unexpected error occured')
-            logging.exception("Oops:")
-            
-            row_time_end = datetime.datetime.now().replace(microsecond=0)
-            row_run_time = row_time_end - row_time_start
-            print(f"Row runtime: {row_run_time}.\n")
-            print(f'______________________________\n')
-            window.Refresh()
-            pass
+          # Disable the Run button when script has started
+          window['Run'].update(disabled=True)
+          
+          time_start = datetime.datetime.now().replace(microsecond=0)
+          directory = os.path.dirname(os.path.realpath(__file__))
 
+          # Initialized data arrays for the CSV output
+          topic_list = []
+          prompt_list = []
+          output_list = []
+
+          with open(input_filename, encoding='unicode_escape') as f:
+            reader = csv.DictReader(f)
+
+            for line in reader:
+
+              row_time_start = datetime.datetime.now().replace(microsecond=0)
+
+              converted_row = convert_row( line )
+              # prompt = converted_row['Prompt']
+              topic = converted_row['Topic']
+              system = converted_row['System']
+              user = converted_row['User']
+
+              logging.basicConfig(level=logging.DEBUG, filename='error.log')
+
+              try:
+                match choose_model:
+                  case '1':
+                    print(f'\nWaiting for a response...\n')
+                    window.Refresh()
+                    response = gpt_4(user, system)
+                  case '2':
+                    print(f'\nWaiting for a response...\n')
+                    window.Refresh()
+                    response = gpt_3_5_turbo(user)
+                  case '3':
+                    max_tokens = input('\nTokens to spend (between 1 to 4,097)?\nEnter token: \n')
+                    print(f'\nWaiting for a response...\n')
+                    window.Refresh()
+                    response = text_davinci_003(user, int(max_tokens))
+
+                print(f'{response.choices[0].message.content}\n')
+                print(f'Usage: Prompt tokens: {response.usage.prompt_tokens}, Completion tokens: {response.usage.completion_tokens}, Total tokens: {response.usage.total_tokens}\n')
+
+                topic_list.append(topic)
+                prompt_list.append(user)
+                output_list.append(response.choices[0].message.content)
+
+                row_time_end = datetime.datetime.now().replace(microsecond=0)
+                row_run_time = row_time_end - row_time_start
+                print(f"Row runtime: {row_run_time}.\n")
+                print(f'______________________________\n')
+                window.Refresh()
+              
+              except:
+                print(f'An error occured while working on: {user}\n')
+                topic_list.append(topic)
+                prompt_list.append(user)
+                output_list.append('Unexpected error occured')
+                logging.exception("Oops:")
+                
+                row_time_end = datetime.datetime.now().replace(microsecond=0)
+                row_run_time = row_time_end - row_time_start
+                print(f"Row runtime: {row_run_time}.\n")
+                print(f'______________________________\n')
+                window.Refresh()
+                pass
+
+              window.Refresh()
+
+          # Save output to a CSV file
+          now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
+          print('Saving to a CSV file...\n')
+          print(f'Topic: {len(topic_list)}, Prompt: {len(prompt_list)}, Output: {len(output_list)}\n')
+          data = {"Topic": topic_list, "Prompt": prompt_list, "Output": output_list}
+          df = pd.DataFrame.from_dict(data, orient='index')
+          df = df.transpose()
+
+          filename = f"completion{ now }.csv"
+
+          print(f'{filename} saved sucessfully.\n')
+
+          file_path = os.path.join(directory,'csvfiles/', filename)
+          df.to_csv(file_path)
+
+          time_end = datetime.datetime.now().replace(microsecond=0)
+          runtime = time_end - time_start
+          print(f"Script runtime: {runtime}.\n")
           window.Refresh()
 
-      # Save output to a CSV file
-      now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
-      print('Saving to a CSV file...\n')
-      print(f'Topic: {len(topic_list)}, Prompt: {len(prompt_list)}, Output: {len(output_list)}\n')
-      data = {"Topic": topic_list, "Prompt": prompt_list, "Output": output_list}
-      df = pd.DataFrame.from_dict(data, orient='index')
-      df = df.transpose()
-
-      filename = f"completion{ now }.csv"
-
-      print(f'{filename} saved sucessfully.\n')
-
-      file_path = os.path.join(directory,'csvfiles/', filename)
-      df.to_csv(file_path)
-
-      time_end = datetime.datetime.now().replace(microsecond=0)
-      runtime = time_end - time_start
-      print(f"Script runtime: {runtime}.\n")
-      window.Refresh()
-
-      # Enable all button after run
-      window['Run'].update(disabled=False)
-      window['gpt-4'].update(disabled=False)
-      window['gpt-3.5-turbo'].update(disabled=False)
-      window['text-davinci-003'].update(disabled=False)
-
-  window.close()
+          # Enable all button after run
+          window['Run'].update(disabled=False)
+          window['gpt-4'].update(disabled=False)
+          window['gpt-3.5-turbo'].update(disabled=False)
+          window['text-davinci-003'].update(disabled=False)
 
 if __name__ == '__main__':
   main()
