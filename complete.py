@@ -102,6 +102,11 @@ def completion():
         topic_list.append(topic)
         prompt_list.append(user)
         output_list.append(response.choices[0].message.content)
+
+        row_time_end = datetime.datetime.now().replace(microsecond=0)
+        row_run_time = row_time_end - row_time_start
+        print(f"Row runtime: {row_run_time}.\n")
+        print(f'______________________________\n')
       
       except:
         print(f'An error occured while working on: {user}\n')
@@ -109,16 +114,12 @@ def completion():
         prompt_list.append(user)
         output_list.append('Unexpected error occured')
         logging.exception("Oops:")
+        
+        row_time_end = datetime.datetime.now().replace(microsecond=0)
+        row_run_time = row_time_end - row_time_start
+        print(f"Row runtime: {row_run_time}.\n")
+        print(f'______________________________\n')
         pass
-      
-      row_time_end = datetime.datetime.now().replace(microsecond=0)
-      row_run_time = row_time_end - row_time_start
-      print(f"Row runtime: {row_run_time}.\n")
-  
-  time_end = datetime.datetime.now().replace(microsecond=0)
-  runtime = time_end - time_start
-  print(f"Script runtime: {runtime}.\n")
-  print(f'______________________________\n')
 
   # Save output to a CSV file
   now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
