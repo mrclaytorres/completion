@@ -32,9 +32,9 @@ Please visit [OpenAI](https://platform.openai.com/) to get your API Key.
 When you run the application in the command line, it will ask for your desired OpenAI model (_just use the appropriate number_), if you want to use `gpt-4` model, make sure your account has `gpt-4` enabled. As of this writing, gpt-4 is invite-only.
 
 ## GUI Version
-I created a GUI version of this application. If you want to test it on the fly just run the `gui.py` file.  
+I created a GUI version of this application. If you want to test it on the fly, just run the `gui.py` file.  
 
-If you want an executable application, you can use any Python packages that converts Python code into an executable file. I have great success with PyInstall.  
+If you want an executable application, you can use any Python packages that converts Python code into an executable file. I have great success with PyInstaller.  
 
 To learn more about how to use PyInstaller, check out Using [PyInstaller to Easily Distribute Python Applications](https://realpython.com/pyinstaller-python/).
 
